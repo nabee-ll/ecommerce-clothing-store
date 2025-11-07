@@ -1,22 +1,48 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { AppContext } from '../context/AppContext';
 import api from '../services/api';
 
 const LoginPage: React.FC = () => {
-  const { dispatch } = useContext(AppContext);
+  const { state, dispatch } = useContext(AppContext);
+  
+  useEffect(() => {
+    console.log('Current view:', state.view);
+  }, [state.view]);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
+  const validatePassword = (password: string): boolean => {
+    if (password.length < 8) {
+      setError("Password must be at least 8 characters long");
+      return false;
+    }
+    return true;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
+    
+    if (!validatePassword(password)) {
+      setLoading(false);
+      return;
+    }
+    
     try {
       const data = await api.loginUser({ username, password });
       dispatch({ type: 'SET_USER', payload: { user: data.user, token: data.access_token } });
-      dispatch({ type: 'SET_VIEW', payload: { view: 'home' } });
+      // If there's a product waiting to be added to cart, add it after login
+      const pendingProduct = localStorage.getItem('pendingCartProduct');
+      if (pendingProduct) {
+        dispatch({ type: 'ADD_TO_CART', payload: JSON.parse(pendingProduct) });
+        localStorage.removeItem('pendingCartProduct');
+        dispatch({ type: 'SET_VIEW', payload: { view: 'cart' } });
+      } else {
+        dispatch({ type: 'SET_VIEW', payload: { view: 'home' } });
+      }
     } catch (err: any) {
       setError(err.message || 'An unexpected error occurred.');
     } finally {
@@ -60,9 +86,19 @@ const LoginPage: React.FC = () => {
             <button
               type="submit"
               disabled={loading}
-              className="bg-accent hover:bg-blue-600/90 text-white font-bold py-2.5 px-4 rounded-lg focus:outline-none focus:shadow-outline transition w-full disabled:bg-gray-300"
+              className="bg-accent hover:bg-accent-dark text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? 'Logging in...' : 'Sign In'}
+              {loading ? "Logging in..." : "Sign In"}
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                dispatch({ type: 'SET_VIEW', payload: { view: 'forgot-password' } });
+                console.log('Navigating to forgot password page'); // Debug log
+              }}
+              className="inline-block align-baseline font-bold text-sm text-accent hover:text-accent-dark"
+            >
+              Forgot Password?
             </button>
           </div>
           <p className="text-center text-secondary text-sm mt-8">

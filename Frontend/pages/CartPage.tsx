@@ -10,10 +10,14 @@ const CartPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
-  const totalPrice = cart.reduce((total, item) => total + item.price * item.quantity, 0);
+  const totalPrice = cart.reduce((total, item) => total + Number(item.price) * item.quantity, 0);
 
   const handleQuantityChange = (productId: number, quantity: number) => {
-    dispatch({ type: 'UPDATE_CART_QUANTITY', payload: { productId, quantity } });
+    if (quantity > 0) {
+      dispatch({ type: 'UPDATE_CART_QUANTITY', payload: { productId, quantity } });
+    } else {
+      dispatch({ type: 'REMOVE_FROM_CART', payload: productId });
+    }
   };
 
   const handlePlaceOrder = async () => {
@@ -27,12 +31,16 @@ const CartPage: React.FC = () => {
     
     const orderData = {
         user_id: user.id,
-        items: cart.map(item => ({ product_id: item.id, quantity: item.quantity }))
+        items: cart.map(item => ({
+            product_id: item.id,
+            quantity: item.quantity,
+            price: Number(item.price)
+        }))
     };
 
     try {
-        await api.placeOrder(orderData, token);
-        setSuccess('Order placed successfully! Thank you for your purchase.');
+        const response = await api.placeOrder(orderData, token);
+        setSuccess(`${response.message} Your order total is $${response.total_price.toFixed(2)}`);
         dispatch({ type: 'CLEAR_CART' });
         setTimeout(() => {
             dispatch({ type: 'SET_VIEW', payload: { view: 'orders' } });
@@ -65,7 +73,7 @@ const CartPage: React.FC = () => {
                   <img src={item.image} alt={item.name} className="w-24 h-24 object-cover rounded-md" />
                   <div className="ml-4 flex-grow">
                     <h3 className="font-semibold text-lg">{item.name}</h3>
-                    <p className="text-secondary">${item.price.toFixed(2)}</p>
+                    <p className="text-secondary">${Number(item.price).toFixed(2)}</p>
                     <button onClick={() => dispatch({type: 'REMOVE_FROM_CART', payload: item.id})} className="text-red-500 hover:text-red-700 text-sm mt-2 flex items-center transition-colors">
                         <TrashIcon /> <span className="ml-1">Remove</span>
                     </button>
@@ -80,7 +88,7 @@ const CartPage: React.FC = () => {
                       aria-label={`Quantity for ${item.name}`}
                     />
                   </div>
-                  <p className="font-semibold w-24 text-right text-lg">${(item.price * item.quantity).toFixed(2)}</p>
+                  <p className="font-semibold w-24 text-right text-lg">${(Number(item.price) * item.quantity).toFixed(2)}</p>
                 </li>
               ))}
             </ul>

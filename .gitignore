@@ -1,0 +1,96 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environment
+.venv/
+venv/
+ENV/
+env/
+
+# Environment variables (CONTAINS SENSITIVE DATA!)
+.env
+.env.local
+.env.*.local
+
+# Database credentials and backup files
+*.sql.backup
+*.db
+*.sqlite
+*.sqlite3
+
+# Backup files
+*.bak
+*.bak2
+*.old
+*.backup
+
+# Test files (temporary/development only)
+test_*.py
+check_*.py
+
+# Setup/migration scripts (keep only if needed for deployment)
+add_*.py
+create_test_user.py
+update_*.py
+setup_order_tables.py
+
+# IDE specific files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS specific files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+logs/
+*.log.*
+
+# Temporary files
+*.tmp
+temp/
+tmp/
+
+# Node modules (Frontend)
+node_modules/
+Frontend/node_modules/
+
+# Build outputs
+Frontend/dist/
+Frontend/build/
+
+# Python cache
+*.pyc
+__pycache__/
+.pytest_cache/
+
+# Coverage reports
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+*.cover

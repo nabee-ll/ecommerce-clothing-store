@@ -1,6 +1,7 @@
 import React, { useContext } from 'react';
 import { AppContext } from '../context/AppContext';
 import { CartIcon, UserIcon, LogoutIcon, LoginIcon, OrderIcon } from './icons';
+import SearchBar from './SearchBar';
 
 const Navbar: React.FC = () => {
   const { state, dispatch } = useContext(AppContext);
@@ -14,18 +15,108 @@ const Navbar: React.FC = () => {
   };
 
   return (
-    <header className="bg-background/80 backdrop-blur-md sticky top-0 z-50 border-b border-border">
+    <header className="bg-background sticky top-0 z-50 border-b border-border">
+      <div className="bg-cream text-primary text-sm py-2 text-center font-serif">
+        Free Worldwide Shipping on Orders Over ₹1000
+      </div>
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20">
-          <div className="flex items-center">
+        <div className="flex items-center justify-between h-24">
+          <div className="flex items-center space-x-12">
             <button
-              onClick={() => dispatch({ type: 'SET_VIEW', payload: { view: 'home' } })}
-              className="text-primary font-bold text-3xl tracking-widest"
+              className="text-primary font-serif text-4xl tracking-widest hover:text-accent transition-colors duration-300"
+              onClick={() => {
+                dispatch({ type: 'SET_FILTER_OPTIONS', payload: {
+                  categories: [],
+                  sortBy: null,
+                  priceRange: { min: 0, max: 1000000 }
+                }});
+                dispatch({ type: 'SET_SEARCH_QUERY', payload: '' });
+                dispatch({ type: 'SET_VIEW', payload: { view: 'home' } });
+              }}
             >
-              LUXE
+              NOIR
             </button>
+            <div className="hidden md:flex space-x-8 text-sm tracking-wide">
+              <button 
+                onClick={() => {
+                  dispatch({ 
+                    type: 'SET_VIEW', 
+                    payload: { view: 'category' }
+                  });
+                  dispatch({
+                    type: 'SET_FILTER_OPTIONS',
+                    payload: {
+                      categories: [],
+                      sortBy: 'newest'
+                    }
+                  });
+                }} 
+                className="text-primary hover:text-gold transition-colors duration-300 relative group"
+              >
+                NEW ARRIVALS
+                <span className="absolute -bottom-1 left-0 w-0 h-px bg-gold transition-all duration-300 group-hover:w-full"/>
+              </button>
+              <button 
+                onClick={() => {
+                  dispatch({ 
+                    type: 'SET_VIEW', 
+                    payload: { view: 'category' }
+                  });
+                  dispatch({
+                    type: 'SET_FILTER_OPTIONS',
+                    payload: {
+                      categories: ["Women's"],
+                      sortBy: null
+                    }
+                  });
+                }}
+                className="text-primary hover:text-gold transition-colors duration-300 relative group"
+              >
+                WOMEN
+                <span className="absolute -bottom-1 left-0 w-0 h-px bg-gold transition-all duration-300 group-hover:w-full"/>
+              </button>
+              <button 
+                onClick={() => {
+                  dispatch({ 
+                    type: 'SET_VIEW', 
+                    payload: { view: 'category' }
+                  });
+                  dispatch({
+                    type: 'SET_FILTER_OPTIONS',
+                    payload: {
+                      categories: ["Men's"],
+                      sortBy: null
+                    }
+                  });
+                }}
+                className="text-primary hover:text-gold transition-colors duration-300 relative group"
+              >
+                MEN
+                <span className="absolute -bottom-1 left-0 w-0 h-px bg-gold transition-all duration-300 group-hover:w-full"/>
+              </button>
+              <button 
+                onClick={() => {
+                  dispatch({ 
+                    type: 'SET_VIEW', 
+                    payload: { view: 'category' }
+                  });
+                  dispatch({
+                    type: 'SET_FILTER_OPTIONS',
+                    payload: {
+                      categories: ['Accessories'],
+                      sortBy: null
+                    }
+                  });
+                }}
+                className="text-primary hover:text-gold transition-colors duration-300 relative group"
+              >
+                ACCESSORIES
+                <span className="absolute -bottom-1 left-0 w-0 h-px bg-gold transition-all duration-300 group-hover:w-full"/>
+              </button>
+            </div>
           </div>
-          <div className="flex items-center space-x-6">
+          <div className="flex items-center space-x-8">
+            <SearchBar />
             <button
               onClick={() => dispatch({ type: 'SET_VIEW', payload: { view: 'cart' } })}
               className="relative text-secondary hover:text-primary transition-colors duration-300"

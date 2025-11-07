@@ -5,6 +5,7 @@ import api from '../services/api';
 const RegisterPage: React.FC = () => {
   const { dispatch } = useContext(AppContext);
   const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -12,15 +13,73 @@ const RegisterPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (password.length < 6) {
+    
+    try {
+      // Validate username
+      if (!username) {
+        setError("Username is required.");
+        return;
+      }
+      if (username.length > 50) {
+        setError("Username must be less than 50 characters.");
+        return;
+      }
+      if (username.includes(" ")) {
+        setError("Username cannot contain spaces.");
+        return;
+      }
+
+      // Validate email
+      if (!email) {
+        setError("Email is required.");
+        return;
+      }
+      if (email.length > 100) {
+        setError("Email must be less than 100 characters.");
+        return;
+      }
+      if (!email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+        setError("Please enter a valid email address.");
+        return;
+      }
+
+      // Validate password
+      if (!password) {
+        setError("Password is required.");
+        return;
+      }
+      if (password.length < 6) {
         setError("Password must be at least 6 characters long.");
         return;
+      }
+      if (password.length > 255) {
+        setError("Password is too long.");
+        return;
+      }
+
+      setLoading(true);
+      setError(null);
+      setSuccess(null);
+      
+      // Attempt registration
+      const result = await api.registerUser({ username: username.trim(), email: email.trim(), password });
+      
+      setSuccess('Registration successful! Redirecting to login...');
+      setTimeout(() => {
+        dispatch({ type: 'SET_VIEW', payload: { view: 'login' } });
+      }, 2000);
+    } catch (err) {
+      console.error('Registration error:', err);
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('An unexpected error occurred. Please try again.');
+      }
+    } finally {
+      setLoading(false);
     }
-    setLoading(true);
-    setError(null);
-    setSuccess(null);
     try {
-      await api.registerUser({ username, password });
+      await api.registerUser({ username, email, password });
       setSuccess('Registration successful! Please log in.');
       setTimeout(() => {
         dispatch({ type: 'SET_VIEW', payload: { view: 'login' } });
@@ -48,6 +107,74 @@ const RegisterPage: React.FC = () => {
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
+              maxLength={50}
+              pattern="[^\s]+"
+              title="Username cannot contain spaces"
+              required
+              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
+              placeholder="Enter username (max 50 characters)"
+            />
+            <p className="mt-1 text-xs text-gray-500">Username must be unique and cannot contain spaces</p>
+          </div>
+
+          <div className="mb-5">
+            <label className="block text-secondary text-sm font-semibold mb-2" htmlFor="email">
+              Email Address
+            </label>
+            <input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              maxLength={100}
+              required
+              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
+              placeholder="Enter your email address"
+            />
+            <p className="mt-1 text-xs text-gray-500">Enter a valid email address</p>
+          </div>
+
+          <div className="mb-5">
+            <label className="block text-secondary text-sm font-semibold mb-2" htmlFor="password">
+              Password
+            </label>
+            <input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              minLength={6}
+              maxLength={255}
+              required
+              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
+              placeholder="Enter your password"
+            />
+          </div>
+          
+          <div className="mb-5">
+            <label className="block text-secondary text-sm font-semibold mb-2" htmlFor="email">
+              Email Address
+            </label>
+            <input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
+              placeholder="Enter your email address"
+            />
+          </div>
+
+          <div className="mb-5">
+            <label className="block text-secondary text-sm font-semibold mb-2" htmlFor="password">
+              Password
+            </label>
+            <input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               className="bg-background border border-border rounded-lg w-full py-2.5 px-3 text-primary leading-tight focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
               required
             />

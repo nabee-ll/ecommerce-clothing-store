@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Page</title>
+</head>
+<body>
+    <div id="debug"></div>
+    <script>
+        try {
+            const view = localStorage.getItem('currentView');
+            const cart = localStorage.getItem('cart');
+            const user = localStorage.getItem('user');
+            
+            document.getElementById('debug').innerHTML = `
+                <pre>
+Current View: ${view}
+Cart: ${cart}
+User: ${user}
+                </pre>
+            `;
+        } catch (e) {
+            document.getElementById('debug').innerHTML = `Error: ${e.message}`;
+        }
+    </script>
+</body>
+</html>

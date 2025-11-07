@@ -37,6 +37,22 @@ const OrderHistoryPage: React.FC = () => {
     return products.find(p => p.id === productId);
   };
 
+  const handleCancelOrder = async (orderId: number) => {
+    if (!window.confirm('Are you sure you want to cancel this order?')) {
+      return;
+    }
+
+    try {
+      await api.cancelOrder(orderId, token!);
+      // Refresh orders after cancellation
+      const orderData = await api.getOrderHistory(token!);
+      setOrders(orderData.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()));
+      alert('Order cancelled successfully!');
+    } catch (err) {
+      alert('Failed to cancel order. Please try again.');
+    }
+  };
+
   if (loading) return <Spinner />;
   if (error) return <p className="text-center text-red-500">{error}</p>;
 
@@ -53,9 +69,27 @@ const OrderHistoryPage: React.FC = () => {
                 <div>
                   <h2 className="font-semibold text-lg">Order #{order.id}</h2>
                   <p className="text-sm text-secondary">Placed on: {new Date(order.created_at).toLocaleDateString()}</p>
+                  <p className="text-sm mt-1">
+                    <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${
+                      order.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                      order.status === 'cancelled' ? 'bg-red-100 text-red-800' :
+                      order.status === 'completed' ? 'bg-green-100 text-green-800' :
+                      'bg-gray-100 text-gray-800'
+                    }`}>
+                      {order.status.toUpperCase()}
+                    </span>
+                  </p>
                 </div>
-                <div className="text-right">
-                    <p className="font-bold text-lg">Total: ${order.total_price.toFixed(2)}</p>
+                <div className="text-right flex flex-col items-end space-y-2">
+                  <p className="font-bold text-lg">Total: ₹{order.total_price.toFixed(2)}</p>
+                  {order.status === 'pending' && (
+                    <button
+                      onClick={() => handleCancelOrder(order.id)}
+                      className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded text-sm transition-colors duration-300"
+                    >
+                      Cancel Order
+                    </button>
+                  )}
                 </div>
               </div>
               <ul className="space-y-4 p-4">
