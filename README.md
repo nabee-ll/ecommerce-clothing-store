@@ -179,6 +179,35 @@ E-commerce-Store/
 └── README.md
 ```
 
+## Deployment 🚀
+
+### Deploying Frontend to Vercel
+
+1. Push your code to GitHub (already done!)
+
+2. Go to [Vercel Dashboard](https://vercel.com/dashboard)
+
+3. Import your GitHub repository
+
+4. Vercel will auto-detect the configuration from `vercel.json`
+
+5. Add environment variable in Vercel:
+   - Key: `VITE_API_URL`
+   - Value: Your backend API URL (e.g., `https://your-backend.com`)
+
+6. Deploy! Your frontend will be live at `https://your-app.vercel.app`
+
+### Deploying Backend
+
+The Flask backend needs a server that supports Python. Options:
+- **Railway** (recommended for beginners)
+- **Render**
+- **PythonAnywhere**
+- **Heroku**
+- **AWS EC2**
+
+**Note:** Make sure to set all environment variables on your hosting platform.
+
 ## Contributing 🤝
 
 Feel free to submit issues and pull requests!
